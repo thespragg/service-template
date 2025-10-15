@@ -1,0 +1,66 @@
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - {{APP_NAME_LOWER}}_node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: ["pnpm", "dev"]
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    working_dir: /app
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./server:/app:cached
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
+      - DOTNET_WATCH_RESTART_ON_RUDE_EDIT=true
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database={{APP_NAME_LOWER}};Username={{APP_NAME_LOWER}};Password={{APP_NAME_LOWER}}
+    command: ["dotnet", "watch", "run", "--no-launch-profile"]
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:17
+    container_name: {{APP_NAME_LOWER}}-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER={{APP_NAME_LOWER}}
+      - POSTGRES_PASSWORD={{APP_NAME_LOWER}}
+      - POSTGRES_DB={{APP_NAME_LOWER}}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_CONFIG_SERVER_MODE=False
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  {{APP_NAME_LOWER}}_node_modules:
