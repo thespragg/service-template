@@ -21,11 +21,11 @@ APP_NAME=$(echo "$CLEAN_NAME" \
 
 TMP_DIR=$(mktemp -d)
 
-curl -L -o "$TMP_DIR/template.zip" "https://github.com/yourusername/yourtemplate/archive/refs/heads/main.zip"
+curl -L -o "$TMP_DIR/template.zip" "https://github.com/thespragg/service-template/archive/refs/heads/main.zip"
 
 unzip -q "$TMP_DIR/template.zip" -d "$TMP_DIR"
 
-TEMPLATE_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name "*yourtemplate-main*")
+TEMPLATE_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name "*service-template-main*")
 
 cp -R "$TEMPLATE_DIR/template/." "$APP_NAME"
 
