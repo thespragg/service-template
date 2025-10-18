@@ -29,7 +29,7 @@ TEMPLATE_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name "*service-template-main
 
 cp -R "$TEMPLATE_DIR/template/." "$APP_NAME"
 
-find "$APP_NAME" -type f -exec sed -i "s/{{APP_NAME}}/$APP_NAME/g" {} +
-find "$APP_NAME" -type f -exec sed -i "s/{{APP_NAME_LOWER}}/$APP_NAME_LOWER/g" {} +
+find "$APP_NAME" -type f -exec sed -i '' "s/{{APP_NAME}}/$APP_NAME/g" {} +
+find "$APP_NAME" -type f -exec sed -i '' "s/{{APP_NAME_LOWER}}/$APP_NAME_LOWER/g" {} +
 
 echo "Project '$APP_NAME' created successfully at $(pwd)/$APP_NAME"
