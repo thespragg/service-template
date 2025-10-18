@@ -1,5 +1,3 @@
-using Server.Http.Routes;
-using Server.Http.Routes.Payments;
 using Server.Http.Routes.Users;
 
 namespace Server.Http.Extensions;

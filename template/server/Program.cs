@@ -1,9 +1,11 @@
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Server.Domain.Entities;
+using Server.Domain.Contracts;
+using Server.Domain.Services;
 using Server.Http.Extensions;
 using Server.Persistence;
+using Server.Policies.Json;
 
 namespace Server;
 
