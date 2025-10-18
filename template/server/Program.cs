@@ -11,7 +11,7 @@ public static class Program
 {
     public static async Task Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddCors();
         
@@ -26,21 +26,25 @@ public static class Program
         });
 
         builder.Services.AddUserBinding();
-        builder.Services
-            .AddAuthorizationBuilder()
-            .SetFallbackPolicy(new AuthorizationPolicyBuilder()
-                .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-                .RequireAuthenticatedUser()
-                .Build()
-            );
+        builder.Services.AddAuthorization();
 
         builder.Services.AddDbContext<DataContext>(options =>
             options
                 .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
                 .UseSnakeCaseNamingConvention()
         );
+        
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddOpenApi();
+        builder.Services.AddMemoryCache();
+        builder.Services.AddScoped<IUserCache, UserCache>();
+        builder.Services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.PropertyNameCaseInsensitive = true;
+            options.SerializerOptions.Converters.Add(
+                new JsonStringEnumConverter(new ScreamingSnakeCaseNamingPolicy())
+            );
+        });
 
         var app = builder.Build();
 
@@ -59,15 +63,17 @@ public static class Program
 
         app.UseAuthentication();
         app.UseAuthorization();
+           
         app.UseUserBinding();
 
+        var group = app.MapGroup(string.Empty).RequireAuthorization();
+        group.MapEndpoints();
+        
         using (var scope = app.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<DataContext>();
             await db.Database.MigrateAsync();
         }
-        
-        app.MapGet("user", (User user) => TypedResults.Ok(user));
         await app.RunAsync("http://*:5000");
     }
 }

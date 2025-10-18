@@ -1,9 +1,12 @@
 import { ref, readonly } from 'vue';
 import { useAuth0 } from '@auth0/auth0-vue';
+import type { User } from '@/types/api';
+import { useFlowmosisApi } from '@/api';
 
 const isAuthReady = ref(false);
 const authToken = ref<string | null>(null);
 let initPromise: Promise<void> | null = null;
+const user = ref<User>();
 
 export function useAuth() {
   const auth0 = useAuth0();
@@ -26,8 +29,11 @@ export function useAuth() {
 
         if (auth0.isAuthenticated.value) {
           authToken.value = await auth0.getAccessTokenSilently();
-          isAuthReady.value = true;
+          const api = useFlowmosisApi();
+          user.value = await api.users.getCurrent()
         }
+
+        isAuthReady.value = true;
       } catch (error) {
         console.error('Auth initialization error:', error);
       }
@@ -36,21 +42,11 @@ export function useAuth() {
     return initPromise;
   };
 
-  const refreshToken = async () => {
-    if (auth0.isAuthenticated.value) {
-      try {
-        authToken.value = await auth0.getAccessTokenSilently({ cacheMode: 'off' });
-      } catch (error) {
-        console.error('Token refresh error:', error);
-      }
-    }
-  };
-
   return {
     isAuthReady: readonly(isAuthReady),
     authToken: readonly(authToken),
     initializeAuth,
-    refreshToken,
     ...auth0,
+    user: user.value!
   };
 }
