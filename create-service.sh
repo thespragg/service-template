@@ -29,7 +29,20 @@ TEMPLATE_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name "*service-template-main
 
 cp -R "$TEMPLATE_DIR/template/." "$APP_NAME"
 
-find "$APP_NAME" -type f -exec sed -i '' "s/{{APP_NAME}}/$APP_NAME/g" {} +
-find "$APP_NAME" -type f -exec sed -i '' "s/{{APP_NAME_LOWER}}/$APP_NAME_LOWER/g" {} +
+EXTENSIONS=("*.vue" "*.js" "*.ts" "*.json" "*.css" "*.scss" "*.html" \
+            "*.cs" "*.csproj" "*.sln" "*.config" "*.xml" \
+            "*.md" "*.txt" "*.yml" "*.yaml" "*.sh")
+
+FIND_EXPR=""
+for ext in "${EXTENSIONS[@]}"; do
+  FIND_EXPR="$FIND_EXPR -o -name \"$ext\""
+done
+FIND_EXPR="${FIND_EXPR# -o }"
+
+for PLACEHOLDER in APP_NAME APP_NAME_LOWER; do
+  VALUE="${!PLACEHOLDER}"
+  eval "find \"$APP_NAME\" -type f \( $FIND_EXPR \) -exec sed -i '' \"s/{{${PLACEHOLDER}}}/$VALUE/g\" {} +"
+done
+
 
 echo "Project '$APP_NAME' created successfully at $(pwd)/$APP_NAME"
