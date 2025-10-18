@@ -1,7 +1,7 @@
 import { ref, readonly } from 'vue';
 import { useAuth0 } from '@auth0/auth0-vue';
 import type { User } from '@/types/api';
-import { useFlowmosisApi } from '@/api';
+import { use{{APP_NAME}}Api } from '@/api';
 
 const isAuthReady = ref(false);
 const authToken = ref<string | null>(null);
@@ -29,7 +29,7 @@ export function useAuth() {
 
         if (auth0.isAuthenticated.value) {
           authToken.value = await auth0.getAccessTokenSilently();
-          const api = useFlowmosisApi();
+          const api = use{{APP_NAME}}Api();
           user.value = await api.users.getCurrent()
         }
 
