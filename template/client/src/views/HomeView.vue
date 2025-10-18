@@ -5,9 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { use{{APP_NAME}}Api } from '@/api';
+import { useAuth } from '@/composables/useAuth'
 
-const { users } = use{{APP_NAME}}Api()
-const user = await users.getCurrent();
-console.log(user)
+const { user } = useAuth()
 </script>
