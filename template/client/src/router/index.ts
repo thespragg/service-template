@@ -24,7 +24,7 @@ router.beforeEach(async (to, from, next) => {
   const { isAuthReady, isAuthenticated, loginWithRedirect } = useAuth()
   
   if (to.meta.public) {
-    return next()
+    return true
   }
   
   if (!isAuthReady.value) {
@@ -39,7 +39,7 @@ router.beforeEach(async (to, from, next) => {
   }
   
   if (isAuthenticated.value) {
-    next()
+    return true
   } else {
     loginWithRedirect({
       appState: { targetUrl: to.fullPath }
