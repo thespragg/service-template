@@ -27,6 +27,10 @@ export function useAuth() {
           checkLoading();
         });
 
+        try {
+          await auth0.checkSession();
+        } catch { }
+        
         if (auth0.isAuthenticated.value) {
           authToken.value = await auth0.getAccessTokenSilently();
           const api = use{{APP_NAME}}Api();
